@@ -1,5 +1,7 @@
+import 'package:donezo/Navigation/nagivation.dart';
 import 'package:donezo/Pages/home_page.dart';
-import 'package:donezo/nagivation.dart';
+import 'package:donezo/Pages/starter_page.dart';
+
 import 'package:donezo/theme.dart';
 import 'package:flutter/material.dart';
 

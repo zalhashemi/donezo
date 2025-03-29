@@ -36,7 +36,7 @@ class MainButton extends StatelessWidget {
             text,
             style: TextStyle(
               color: textColor ?? Colors.white,
-              fontFamily: 'GreyCliffCF-ExtraBold',
+              fontFamily: 'Baloo',
               fontWeight: FontWeight.w400,
               fontSize: fontSize ?? 16,
             ),

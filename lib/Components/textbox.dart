@@ -13,6 +13,9 @@ class TextBox extends StatelessWidget {
   final TextInputAction textInputAction;
   final FocusNode? focusNode;
   final FocusNode? nextFocusNode;
+  final Color? fillColor;
+  final Color? labelColor;
+  final Color? borderColor; // New optional border color parameter
 
   const TextBox({
     super.key,
@@ -27,18 +30,21 @@ class TextBox extends StatelessWidget {
     this.textInputAction = TextInputAction.done,
     this.focusNode,
     this.nextFocusNode,
+    this.fillColor,
+    this.labelColor,
+    this.borderColor, // Added to constructor
   });
 
   @override
   Widget build(BuildContext context) {
+    final BorderSide borderSide = borderColor != null
+        ? BorderSide(color: borderColor!, width: 1.0)
+        : BorderSide.none;
+
     return Center(
       child: Container(
-        height: height != null
-            ? MediaQuery.of(context).size.height * (height! / 915)
-            : MediaQuery.of(context).size.height * (48 / 915),
-        width: width != null
-            ? MediaQuery.of(context).size.width * (width! / 412)
-            : MediaQuery.of(context).size.width * (330 / 412),
+        height: height ?? 48,
+        width: width ?? 330,
         child: TextFormField(
           controller: controller,
           obscureText: obscureText,
@@ -65,25 +71,27 @@ class TextBox extends StatelessWidget {
                 fontWeight: FontWeight.w400,
               ),
             ),
-            // floatingLabelStyle: TextStyle(
-            //   color: Theme.of(context).ourYellow,
-            //   fontSize: 16,
-            //   fontWeight: FontWeight.w400,
-            // ),
             labelStyle: TextStyle(
-              color: Theme.of(context).colorScheme.primary,
+              color: labelColor ?? Theme.of(context).colorScheme.primary,
               fontWeight: FontWeight.w400,
             ),
             filled: true,
-            fillColor: Theme.of(context).ourWhite,
+            fillColor: fillColor ?? Theme.of(context).ourWhite,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25),
+              borderSide: borderSide,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25),
+              borderSide: borderSide,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(25),
-              borderSide: const BorderSide(),
+              borderSide: borderSide,
             ),
             floatingLabelBehavior: FloatingLabelBehavior.never,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-            //floatingLabelBehavior: FloatingLabelBehavior.auto,
           ),
         ),
       ),
