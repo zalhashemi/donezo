@@ -1,10 +1,11 @@
+import 'package:donezo/Data/database.dart';
+import 'package:flutter/material.dart';
 import 'package:donezo/Components/main_button.dart';
-import 'package:donezo/Pages/home_page.dart';
 import 'package:donezo/Pages/signup_page.dart';
 import 'package:donezo/theme.dart';
-import 'package:flutter/material.dart';
 import 'package:donezo/Components/textbox.dart';
 import 'package:donezo/Navigation/nagivation.dart';
+import 'package:donezo/Models/user.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -14,13 +15,45 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // Add controllers for email and password
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final DonezoDB _db = DonezoDB();
+
+  Future<void> _handleLogin() async {
+    await _db.init();
+    final users = _db.getUsers();
+    final user = users.firstWhere(
+      (u) => u.email == _emailController.text && u.password == _passwordController.text,
+      orElse: () => User(id: '', name: '', email: '', password: '', userType: ''),
+      
+    );
+    _db.setCurrentUser(user); 
+
+    if (user.id.isNotEmpty) {
+      _db.setCurrentUser(user);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const NavigationPage()),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Login Failed'),
+          content: const Text('Invalid email or password'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
 
   @override
   void dispose() {
-    // Dispose controllers to free up resources
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -31,7 +64,6 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Gradient Background
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -139,25 +171,14 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     child: MainButton(
                       text: 'Login',
-                      onPressed: () {},
+                      onPressed: _handleLogin,
                       width: 330,
                       height: 45,
                       fontSize: 22,
                       color: Colors.transparent,
                     ),
                   ),
-                  // SizedBox(height: 10),
-                  // Text(
-                  //   'Forgot Password?',
-                  //   style: TextStyle(
-                  //     fontSize: 15,
-                  //     fontWeight: FontWeight.w500,
-                  //     fontFamily: 'Baloo2',
-                  //     color: Theme.of(context).colorScheme.primary,
-                  //   ),
-                  // ),
                   SizedBox(height: 170),
-
                   InkWell(
                     onTap: () {
                       Navigator.push(

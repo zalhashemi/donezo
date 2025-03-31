@@ -15,7 +15,8 @@ class TextBox extends StatelessWidget {
   final FocusNode? nextFocusNode;
   final Color? fillColor;
   final Color? labelColor;
-  final Color? borderColor; // New optional border color parameter
+  final Color? borderColor;
+  final Widget? suffixIcon; // Added suffixIcon support
 
   const TextBox({
     super.key,
@@ -32,7 +33,8 @@ class TextBox extends StatelessWidget {
     this.nextFocusNode,
     this.fillColor,
     this.labelColor,
-    this.borderColor, // Added to constructor
+    this.borderColor,
+    this.suffixIcon, // Added to constructor
   });
 
   @override
@@ -48,8 +50,9 @@ class TextBox extends StatelessWidget {
         child: TextFormField(
           controller: controller,
           obscureText: obscureText,
-          maxLines: maxLines,
           focusNode: focusNode,
+          maxLines: obscureText ? 1 : maxLines,
+          minLines: obscureText ? 1 : minLines,
           textInputAction: textInputAction,
           onFieldSubmitted: (value) {
             if (nextFocusNode != null) {
@@ -92,6 +95,7 @@ class TextBox extends StatelessWidget {
             floatingLabelBehavior: FloatingLabelBehavior.never,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            suffixIcon: suffixIcon, // Added suffix icon support
           ),
         ),
       ),

@@ -2,22 +2,33 @@ import 'package:donezo/Components/progress_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:donezo/Components/task_tile.dart';
 import 'package:donezo/Models/task.dart';
+import 'package:hive_flutter/adapters.dart';
 
 class HomePage extends StatefulWidget {
   final List<Task> tasks;
   final Function(Task) onTaskDeleted;
   final Function(Task, bool?) onTaskChecked;
+  final String userName;
 
   const HomePage({
     super.key,
     required this.tasks,
     required this.onTaskDeleted,
     required this.onTaskChecked,
+    required this.userName,
   });
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
+
+// onTap: () {
+//     DonezoDB().logout();
+//     Navigator.pushReplacement(
+//       context,
+//       MaterialPageRoute(builder: (context) => const LoginPage()),
+//     );
+//   },
 
 class _HomePageState extends State<HomePage> {
   @override
@@ -51,53 +62,55 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.white,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
               ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 40.0, top: 40),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Image.asset(
-                            'lib/Images/dino.png',
-                            width: 40,
-                            height: 40,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 10.0, top: 40),
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            "Hello, user",
-                            style: TextStyle(
-                              fontSize: 36,
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.bold,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 40.0, top: 40),
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Image.asset(
+                              'lib/Images/dino.png',
+                              width: 40,
+                              height: 40,
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  const Center(
-                    child: ProgressTile(),
-                  ),
-                  _buildTaskSection(
-                    title: "Pending Tasks",
-                    tasks: pendingTasks,
-                    isEmptyMessage: "You have no pending tasks!",
-                  ),
-                  _buildTaskSection(
-                    title: "Completed Tasks",
-                    tasks: completedTasks,
-                    isEmptyMessage: "No completed tasks yet!",
-                    topPadding: pendingTasks.isEmpty ? 40.0 : 20.0,
-                  ),
-                ],
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10.0, top: 40),
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              "Hello, ${widget.userName}",
+                              style: TextStyle(
+                                fontSize: 36,
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Center(
+                        child: ProgressTile(tasks: widget.tasks) // Fixed here
+                        ),
+                    const SizedBox(height: 12),
+                    _buildTaskSection(
+                      title: "Pending Tasks",
+                      tasks: pendingTasks,
+                      isEmptyMessage: "You have no pending tasks!",
+                    ),
+                    _buildTaskSection(
+                      title: "Completed Tasks",
+                      tasks: completedTasks,
+                      isEmptyMessage: "No completed tasks yet!",
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -137,7 +150,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-        const SizedBox(height: 10),
+        //const SizedBox(height: 10),
         tasks.isEmpty
             ? Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
@@ -152,8 +165,9 @@ class _HomePageState extends State<HomePage> {
                 ),
               )
             : SizedBox(
-                height: tasks.length * 80.0,
+                height: tasks.length * 55.0,
                 child: ListView.builder(
+                  padding: EdgeInsets.zero,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: tasks.length,
                   itemBuilder: (context, index) {

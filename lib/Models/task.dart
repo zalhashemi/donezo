@@ -1,15 +1,29 @@
-class Task {
+import 'package:hive/hive.dart';
+
+part 'task.g.dart'; // This will be generated
+
+@HiveType(typeId: 0)
+class Task extends HiveObject {
+  @HiveField(0)
   final String id;
-  final String title;
-  final DateTime dueDate;
-  final String priority;
+
+  @HiveField(1)
+  String title;
+
+  @HiveField(2)
+  DateTime dueDate;
+
+  @HiveField(3)
+  String priority;
+
+  @HiveField(4)
   bool completed;
 
   Task({
     required this.id,
     required this.title,
     required this.dueDate,
-    required this.priority,
+    this.priority = 'medium',
     this.completed = false,
   });
 }

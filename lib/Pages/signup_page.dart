@@ -1,7 +1,11 @@
+import 'package:donezo/Data/database.dart';
+import 'package:flutter/material.dart';
 import 'package:donezo/Components/main_button.dart';
 import 'package:donezo/theme.dart';
-import 'package:flutter/material.dart';
 import 'package:donezo/Components/textbox.dart';
+import 'package:donezo/Models/user.dart';
+import 'package:donezo/Navigation/nagivation.dart';
+import 'package:uuid/uuid.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -16,17 +20,90 @@ class _SignupPageState extends State<SignupPage> {
       TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final DonezoDB _db = DonezoDB();
+  final Uuid _uuid = const Uuid();
 
   String? _selectedUserType;
   String _organizationCode = '';
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _nameController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
+  Future<void> _handleSignup() async {
+    // Field empty validation
+    if (_nameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _confirmPasswordController.text.isEmpty) {
+      _showErrorDialog('All fields are required');
+      return;
+    }
+
+    // Name validation (letters only)
+    if (!RegExp(r'^[a-zA-Z ]+$').hasMatch(_nameController.text)) {
+      _showErrorDialog('Name can only contain letters');
+      return;
+    }
+
+    // Email validation
+    if (!_emailController.text.contains('@')) {
+      _showErrorDialog('Invalid email format');
+      return;
+    }
+
+    // Password validation
+    if (_passwordController.text.length < 8) {
+      _showErrorDialog('Password must be at least 8 characters');
+      return;
+    }
+    if (!RegExp(r'[0-9]').hasMatch(_passwordController.text)) {
+      _showErrorDialog('Password must contain at least one number');
+      return;
+    }
+
+    if (_passwordController.text != _confirmPasswordController.text) {
+      _showErrorDialog('Passwords do not match');
+      return;
+    }
+
+    final newUser = User(
+      id: _uuid.v4(),
+      name: _nameController.text,
+      email: _emailController.text,
+      password: _passwordController.text,
+      userType: _selectedUserType ?? 'Individual',
+      organizationCode: _organizationCode.isNotEmpty ? _organizationCode : null,
+    );
+
+    await _db.init();
+    final existingUser = _db.getUsers().any((u) => u.email == newUser.email);
+
+    if (existingUser) {
+      _showErrorDialog('Email already registered');
+      return;
+    }
+
+    await _db.createUser(newUser);
+    _db.setCurrentUser(newUser);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const NavigationPage()),
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Signup Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _showOrganizationCodeDialog() async {
@@ -42,7 +119,7 @@ class _SignupPageState extends State<SignupPage> {
             style: TextStyle(color: Theme.of(context).colorScheme.primary),
           )),
           content: SizedBox(
-            height: 50, // Fixed height
+            height: 50,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -52,7 +129,7 @@ class _SignupPageState extends State<SignupPage> {
                   labelColor: Colors.grey[600],
                   fillColor: Theme.of(context).ourGrey,
                   borderColor: Colors.transparent,
-                  width: 250, // Set custom width
+                  width: 250,
                 ),
               ],
             ),
@@ -138,6 +215,15 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _nameController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
@@ -195,95 +281,125 @@ class _SignupPageState extends State<SignupPage> {
                   top: Radius.circular(40),
                 ),
               ),
-              child: Column(
-                children: [
-                  const SizedBox(height: 30),
-                  Text(
-                    'Get Started',
-                    style: TextStyle(
-                      fontSize: 36,
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.bold,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 30),
+                    Text(
+                      'Get Started',
+                      style: TextStyle(
+                        fontSize: 36,
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const Text(
-                    'Join the donezo family',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'Baloo2',
-                      color: Colors.grey,
+                    const Text(
+                      'Join the donezo family',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'Baloo2',
+                        color: Colors.grey,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 30),
-                  TextBox(
-                    labelText: 'Full Name',
-                    controller: _nameController,
-                    height: 90,
-                    borderColor: Colors.transparent,
-                    labelColor: Colors.grey[600],
-                    fillColor: Theme.of(context).ourGrey,
-                  ),
-                  TextBox(
-                    labelText: 'Email',
-                    controller: _emailController,
-                    height: 90,
-                    borderColor: Colors.transparent,
-                    labelColor: Colors.grey[600],
-                    fillColor: Theme.of(context).ourGrey,
-                  ),
-                  TextBox(
-                    labelText: 'Password',
-                    controller: _passwordController,
-                    height: 90,
-                    borderColor: Colors.transparent,
-                    labelColor: Colors.grey[600],
-                    fillColor: Theme.of(context).ourGrey,
-                  ),
-                  TextBox(
-                    labelText: 'Confirm Password',
-                    controller: _confirmPasswordController,
-                    height: 90,
-                    borderColor: Colors.transparent,
-                    labelColor: Colors.grey[600],
-                    fillColor: Theme.of(context).ourGrey,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 40.0),
-                    child: Row(
-                      children: [
-                        _buildUserTypeContainer('Individual', Icons.person),
-                        const SizedBox(width: 20),
-                        _buildUserTypeContainer(
-                            'Organization', Icons.people_alt),
-                      ],
+                    const SizedBox(height: 30),
+                    TextBox(
+                      labelText: 'Full Name',
+                      controller: _nameController,
+                      height: 90,
+                      borderColor: Colors.transparent,
+                      labelColor: Colors.grey[600],
+                      fillColor: Theme.of(context).ourGrey,
                     ),
-                  ),
-                  const SizedBox(height: 30),
-                  Container(
-                    width: 330,
-                    height: 45,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      gradient: const LinearGradient(
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                        colors: [
-                          Color(0xFF461E55),
-                          Color(0xFF906DB0),
+                    TextBox(
+                      labelText: 'Email',
+                      controller: _emailController,
+                      height: 90,
+                      borderColor: Colors.transparent,
+                      labelColor: Colors.grey[600],
+                      fillColor: Theme.of(context).ourGrey,
+                    ),
+                    TextBox(
+                      labelText: 'Password',
+                      controller: _passwordController,
+                      obscureText: _obscurePassword,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.grey[600],
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      ),
+                      height: 90,
+                      borderColor: Colors.transparent,
+                      labelColor: Colors.grey[600],
+                      fillColor: Theme.of(context).ourGrey,
+                    ),
+                    TextBox(
+                      labelText: 'Confirm Password',
+                      controller: _confirmPasswordController,
+                      obscureText: _obscureConfirmPassword,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureConfirmPassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.grey[600],
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureConfirmPassword = !_obscureConfirmPassword;
+                          });
+                        },
+                      ),
+                      height: 90,
+                      borderColor: Colors.transparent,
+                      labelColor: Colors.grey[600],
+                      fillColor: Theme.of(context).ourGrey,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 40.0),
+                      child: Row(
+                        children: [
+                          _buildUserTypeContainer('Individual', Icons.person),
+                          const SizedBox(width: 20),
+                          _buildUserTypeContainer(
+                              'Organization', Icons.people_alt),
                         ],
                       ),
                     ),
-                    child: MainButton(
-                      text: 'Sign Up',
-                      onPressed: () {},
+                    const SizedBox(height: 30),
+                    Container(
                       width: 330,
                       height: 45,
-                      fontSize: 22,
-                      color: Colors.transparent,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        gradient: const LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Color(0xFF461E55),
+                            Color(0xFF906DB0),
+                          ],
+                        ),
+                      ),
+                      child: MainButton(
+                        text: 'Sign Up',
+                        onPressed: _handleSignup,
+                        width: 330,
+                        height: 45,
+                        fontSize: 22,
+                        color: Colors.transparent,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

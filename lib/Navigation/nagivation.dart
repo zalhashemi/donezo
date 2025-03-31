@@ -1,6 +1,6 @@
+import 'package:donezo/Data/database.dart';
 import 'package:flutter/material.dart';
 import 'package:donezo/Components/main_button.dart';
-import 'package:donezo/Components/task_tile.dart';
 import 'package:donezo/Pages/home_page.dart';
 import 'package:donezo/Pages/calendar_page.dart';
 import 'package:donezo/theme.dart';
@@ -18,7 +18,28 @@ class NavigationPage extends StatefulWidget {
 
 class _NavigationPageState extends State<NavigationPage> {
   int selectedPageIndex = 0;
+  late final DonezoDB _db;
   List<Task> tasks = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _db = DonezoDB();
+    _initializeDatabase();
+  }
+
+  Future<void> _initializeDatabase() async {
+    await _db.init();
+    _loadTasks();
+  }
+
+  void _loadTasks() {
+    setState(() {
+      tasks = _db.getTasks();
+      _sortTasks();
+    });
+  }
+
   void onItemTapped(int index) {
     if (index == 1) {
       CreateTaskBottomSheet.show(context, addTask);
@@ -35,18 +56,23 @@ class _NavigationPageState extends State<NavigationPage> {
           tasks: tasks,
           onTaskDeleted: _handleTaskDeleted,
           onTaskChecked: _handleTaskChecked,
+          userName: _db.getCurrentUser()?.name ?? 'User', // Add this line
         ),
         const CalendarPage(),
       ];
 
   void _handleTaskDeleted(Task deletedTask) {
-    setState(() => tasks.remove(deletedTask));
+    setState(() {
+      tasks.remove(deletedTask);
+      _db.deleteTask(deletedTask.id);
+    });
   }
 
   void _handleTaskChecked(Task task, bool? completed) {
     setState(() {
       task.completed = completed ?? false;
       _sortTasks();
+      _db.updateTask(task);
     });
   }
 
@@ -70,6 +96,7 @@ class _NavigationPageState extends State<NavigationPage> {
     setState(() {
       tasks.add(newTask);
       _sortTasks();
+      _db.addTask(newTask);
     });
   }
 
@@ -78,10 +105,10 @@ class _NavigationPageState extends State<NavigationPage> {
     return Scaffold(
       body: IndexedStack(
         index: selectedPageIndex,
-        children: pages, // Now dynamically rebuilt
+        children: pages,
       ),
       bottomNavigationBar: Container(
-        height: 100,
+        height: 90,
         decoration: const BoxDecoration(
           borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
           color: CustomColors.ourYellow,
@@ -103,7 +130,7 @@ class _NavigationPageState extends State<NavigationPage> {
                 label: "",
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.add_circle, size: 60),
+                icon: Icon(Icons.add_circle, size: 55),
                 label: "",
               ),
               BottomNavigationBarItem(
@@ -215,17 +242,27 @@ class _CreateTaskBottomSheetContentState
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(20.0),
-                child: Text(
-                  'Create New Task',
-                  style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.w400,
-                    fontFamily: 'Baloo',
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back,
+                          size: 25, color: Colors.white),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    const SizedBox(width: 40),
+                    const Text(
+                      'Create New Task',
+                      style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'Baloo',
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
               Center(
@@ -239,7 +276,7 @@ class _CreateTaskBottomSheetContentState
                           name: 'title',
                           controller: taskTitle,
                           validator: (value) {
-                            if (value == null || value.isEmpty) {
+                            if (value?.isEmpty ?? true) {
                               return 'Please enter a task title';
                             }
                             return null;
@@ -314,9 +351,8 @@ class _CreateTaskBottomSheetContentState
                                     inputType: InputType.date,
                                     format: DateFormat("MMMMEEEEd"),
                                     validator: (value) {
-                                      if (value == null) {
+                                      if (value == null)
                                         return 'Please select a due date';
-                                      }
                                       return null;
                                     },
                                     decoration: InputDecoration(
@@ -402,9 +438,8 @@ class _CreateTaskBottomSheetContentState
                                 height: 15,
                                 child: Switch(
                                   value: reminderEnabled,
-                                  onChanged: (bool value) {
-                                    setState(() => reminderEnabled = value);
-                                  },
+                                  onChanged: (bool value) =>
+                                      setState(() => reminderEnabled = value),
                                   activeColor: Theme.of(context).lightPurple,
                                   activeTrackColor:
                                       Theme.of(context).lightPurple,
@@ -453,9 +488,7 @@ class _CreateTaskBottomSheetContentState
                                   barrierDismissible: true,
                                   builder: (context) {
                                     Future.delayed(const Duration(seconds: 2),
-                                        () {
-                                      Navigator.of(context).pop();
-                                    });
+                                        () => Navigator.of(context).pop());
                                     return AlertDialog(
                                       content: SizedBox(
                                         height: 180,
