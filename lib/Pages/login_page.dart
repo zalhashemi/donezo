@@ -148,6 +148,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   TextBox(
                     labelText: 'Password',
+                    //TODO: add password handler
                     controller: _passwordController,
                     height: 90,
                     borderColor: Colors.transparent,

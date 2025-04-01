@@ -1,29 +1,40 @@
 import 'package:hive/hive.dart';
 
-part 'task.g.dart'; // This will be generated
+part 'task.g.dart';
 
 @HiveType(typeId: 0)
 class Task extends HiveObject {
   @HiveField(0)
-  final String id;
-
-  @HiveField(1)
   String title;
 
-  @HiveField(2)
+  @HiveField(1)
   DateTime dueDate;
 
-  @HiveField(3)
+  @HiveField(2)
   String priority;
 
-  @HiveField(4)
+  @HiveField(3)
   bool completed;
 
   Task({
-    required this.id,
     required this.title,
     required this.dueDate,
     this.priority = 'medium',
     this.completed = false,
   });
+
+  // Essential copyWith method
+  Task copyWith({
+    String? title,
+    DateTime? dueDate,
+    String? priority,
+    bool? completed,
+  }) {
+    return Task(
+      title: title ?? this.title,
+      dueDate: dueDate ?? this.dueDate,
+      priority: priority ?? this.priority,
+      completed: completed ?? this.completed,
+    );
+  }
 }

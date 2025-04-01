@@ -1,14 +1,18 @@
+import 'package:donezo/Components/main_button.dart';
 import 'package:donezo/Components/progress_tile.dart';
+import 'package:donezo/Data/database.dart';
 import 'package:flutter/material.dart';
 import 'package:donezo/Components/task_tile.dart';
 import 'package:donezo/Models/task.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:donezo/Pages/login_page.dart'; // Ensure this import exists
 
 class HomePage extends StatefulWidget {
   final List<Task> tasks;
   final Function(Task) onTaskDeleted;
   final Function(Task, bool?) onTaskChecked;
   final String userName;
+  final String userEmail; // Added email parameter
 
   const HomePage({
     super.key,
@@ -16,21 +20,16 @@ class HomePage extends StatefulWidget {
     required this.onTaskDeleted,
     required this.onTaskChecked,
     required this.userName,
+    required this.userEmail, // Added email parameter
   });
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
-// onTap: () {
-//     DonezoDB().logout();
-//     Navigator.pushReplacement(
-//       context,
-//       MaterialPageRoute(builder: (context) => const LoginPage()),
-//     );
-//   },
-
 class _HomePageState extends State<HomePage> {
+  final DonezoDB _db = DonezoDB();
+
   @override
   Widget build(BuildContext context) {
     final pendingTasks = widget.tasks.where((task) => !task.completed).toList();
@@ -49,6 +48,63 @@ class _HomePageState extends State<HomePage> {
                 colors: [Color(0xFF22162B), Color(0xFF451F55)],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
+              ),
+            ),
+          ),
+          // Profile Dropdown Button
+          Positioned(
+            top: 50,
+            left: 20,
+            child: PopupMenuButton(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              itemBuilder: (context) => <PopupMenuEntry>[
+                PopupMenuItem(
+                  enabled: false,
+                  child: Column(
+                    children: [
+                      const Icon(Icons.person, size: 60, color: Colors.black),
+                      const SizedBox(height: 8),
+                      Text(widget.userName,
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text(widget.userEmail,
+                          style: TextStyle(color: Colors.grey[600])),
+                    ],
+                  ),
+                ),
+                const PopupMenuDivider(),
+                PopupMenuItem(
+                  onTap: () {}, // Switch to Organization Mode (empty for now)
+                  child: const ListTile(
+                    leading: Icon(Icons.group_outlined),
+                    title: Text('Switch to Organization Mode'),
+                  ),
+                ),
+                PopupMenuItem(
+                  onTap: () {
+                    _db.logout();
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginPage()),
+                    );
+                  },
+                  child: const ListTile(
+                    leading: Icon(Icons.logout_outlined),
+                    title: Text('Log out'),
+                  ),
+                ),
+              ],
+              child: Row(
+                children: const [
+                  Icon(
+                    Icons.person,
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                  Icon(Icons.arrow_drop_down, color: Colors.white),
+                ],
               ),
             ),
           ),
@@ -83,7 +139,7 @@ class _HomePageState extends State<HomePage> {
                           child: Align(
                             alignment: Alignment.topLeft,
                             child: Text(
-                              "Hello, ${widget.userName}",
+                              "Hello, ${widget.userName.split(' ')[0]}",
                               style: TextStyle(
                                 fontSize: 36,
                                 color: Theme.of(context).colorScheme.primary,
@@ -95,10 +151,8 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Center(
-                        child: ProgressTile(tasks: widget.tasks) // Fixed here
-                        ),
-                    const SizedBox(height: 12),
+                    Center(child: ProgressTile(tasks: widget.tasks)),
+                    const SizedBox(height: 35),
                     _buildTaskSection(
                       title: "Pending Tasks",
                       tasks: pendingTasks,
@@ -150,7 +204,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-        //const SizedBox(height: 10),
         tasks.isEmpty
             ? Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
@@ -178,9 +231,9 @@ class _HomePageState extends State<HomePage> {
                         vertical: 5,
                       ),
                       child: TaskTile(
-                        key: ValueKey(task.id),
-                        task: task, // Changed to pass whole task object
-                        onDelete: () => widget.onTaskDeleted(task),
+                        key: ValueKey(task.key),
+                        task: task,
+                        onDelete: () => widget.onTaskDeleted(task), 
                         onCheck: (value) => widget.onTaskChecked(task, value),
                       ),
                     );

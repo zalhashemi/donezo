@@ -34,6 +34,7 @@ class _StarterPageState extends State<StarterPage> {
               const Text(
                 'Welcome to\n     donezo',
                 style: TextStyle(
+                  height: 0.8,
                   color: Colors.white,
                   fontSize: 36,
                   fontWeight: FontWeight.bold,

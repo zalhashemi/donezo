@@ -7,42 +7,73 @@ class DonezoDB {
   factory DonezoDB() => _instance;
   DonezoDB._internal();
 
-  late Box _box;
+  late Box _mainBox;
   User? _currentUser;
+  final String _taskBoxPrefix = 'user_tasks_';
 
   Future<void> init() async {
-    await Hive.openBox('donezo_box');
-    _box = Hive.box('donezo_box');
+    await Hive.openBox('donezo_main_box');
+    _mainBox = Hive.box('donezo_main_box');
+  }
+
+  Future<Box<Task>> getTaskBox() async {
+    if (_currentUser == null) {
+      throw Exception("No logged in user"); // Keep this as safety
+    }
+    final boxName = '$_taskBoxPrefix${_currentUser!.id}';
+    return await Hive.openBox<Task>(boxName);
   }
 
   User? getCurrentUser() {
-    final userId = _box.get('currentUserId');
+    final userId = _mainBox.get('currentUserId');
     if (userId == null) return null;
-
-    final users = getUsers();
-    return users.firstWhere(
-      (u) => u.id == userId,
-      orElse: () =>
-          User(id: '', name: '', email: '', password: '', userType: ''),
-    );
+    return _mainBox
+        .get('users', defaultValue: <User>[])
+        .cast<User>()
+        .firstWhere(
+          (u) => u.id == userId,
+          orElse: () =>
+              User(id: '', name: '', email: '', password: '', userType: ''),
+        );
   }
 
-  void setCurrentUser(User user) {
+  Future<void> setCurrentUser(User user) async {
     _currentUser = user;
-    _box.put('currentUserId', user.id);
+    await _mainBox.put('currentUserId', user.id);
+    await getTaskBox();
   }
 
-  void logout() {
-    _currentUser = null;
-    _box.delete('currentUserId');
+  Future<List<Task>> getCurrentUserTasks() async {
+    final box = await getTaskBox();
+    return box.values.toList();
   }
 
-  // User management
+  Future<void> addTask(Task task) async {
+    final box = await getTaskBox();
+    await box.add(task);
+  }
+
+  Future<void> updateTask(Task task) async {
+    final box = await getTaskBox();
+
+    // Ensure the task has a valid integer key
+    if (task.key is int) {
+      await box.put(task.key, task);
+    } else {
+      throw Exception("Task has invalid key for update: ${task.key}");
+    }
+  }
+
+  Future<void> deleteTask(Task task) async {
+    final box = await getTaskBox();
+    await task.delete();
+  }
+
   List<User> getUsers() =>
-      _box.get('users', defaultValue: <User>[]).cast<User>();
+      _mainBox.get('users', defaultValue: <User>[]).cast<User>();
 
   Future<void> saveUsers(List<User> users) async =>
-      await _box.put('users', users);
+      await _mainBox.put('users', users);
 
   Future<bool> createUser(User newUser) async {
     final users = getUsers();
@@ -52,43 +83,8 @@ class DonezoDB {
     return true;
   }
 
-  User? getUser(String email) => getUsers().firstWhere(
-        (u) => u.email == email,
-        orElse: () =>
-            User(id: '', name: '', email: '', password: '', userType: ''),
-      );
-
-  // Task management
-  List<Task> getCurrentUserTasks() => _box.get(
-        'tasks_${_currentUser?.id}',
-        defaultValue: <Task>[],
-      ).cast<Task>();
-
-  Future<void> saveCurrentUserTasks(List<Task> tasks) async =>
-      await _box.put('tasks_${_currentUser?.id}', tasks);
-
-  Future<void> addTask(Task task) async {
-    final tasks = getCurrentUserTasks();
-    tasks.add(task);
-    await saveCurrentUserTasks(tasks);
-  }
-
-  Future<void> updateTask(Task task) async {
-    final tasks = getCurrentUserTasks();
-    final index = tasks.indexWhere((t) => t.id == task.id);
-    if (index != -1) {
-      tasks[index] = task;
-      await saveCurrentUserTasks(tasks);
-    }
-  }
-
-  Future<void> deleteTask(String taskId) async {
-    final tasks = getCurrentUserTasks();
-    tasks.removeWhere((t) => t.id == taskId);
-    await saveCurrentUserTasks(tasks);
-  }
-
-  List<Task> getTasks() {
-    return _box.get('tasks', defaultValue: <Task>[]).cast<Task>();
+  void logout() {
+    _currentUser = null;
+    _mainBox.delete('currentUserId');
   }
 }

@@ -14,9 +14,9 @@ import 'package:hive_flutter/hive_flutter.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
+  Hive.registerAdapter(TaskAdapter()); // Make sure this is registered
   Hive.registerAdapter(UserAdapter());
-  Hive.registerAdapter(TaskAdapter());
-  await Hive.openBox('donezo_box');
+  await Hive.openBox('donezo_main_box');
   runApp(const MyApp());
 }
 
@@ -39,28 +39,16 @@ class AuthWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DonezoDB db = DonezoDB();
-
     return FutureBuilder(
-      future: db.init(),
+      future: DonezoDB().init(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          // Check if user is logged in
-          final currentUser = db.getCurrentUser();
+          final currentUser = DonezoDB().getCurrentUser();
           return currentUser != null
               ? const NavigationPage()
               : const StarterPage();
         }
-
-        // Show loading screen while checking auth state
-        return Scaffold(
-          body: Container(
-            color: Colors.white,
-            child: const Center(
-              child: CircularProgressIndicator(),
-            ),
-          ),
-        );
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
       },
     );
   }

@@ -43,6 +43,10 @@ class _SignupPageState extends State<SignupPage> {
       _showErrorDialog('Name can only contain letters');
       return;
     }
+    if (_nameController.text.trimLeft().isEmpty) {
+      _showErrorDialog('Name cannot begin with a space');
+      return;
+    }
 
     // Email validation
     if (!_emailController.text.contains('@')) {

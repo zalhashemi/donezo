@@ -17,27 +17,24 @@ class TaskAdapter extends TypeAdapter<Task> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Task(
-      id: fields[0] as String,
-      title: fields[1] as String,
-      dueDate: fields[2] as DateTime,
-      priority: fields[3] as String,
-      completed: fields[4] as bool,
+      title: fields[0] as String,
+      dueDate: fields[1] as DateTime,
+      priority: fields[2] as String,
+      completed: fields[3] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, Task obj) {
     writer
-      ..writeByte(5)
-      ..writeByte(0)
-      ..write(obj.id)
-      ..writeByte(1)
-      ..write(obj.title)
-      ..writeByte(2)
-      ..write(obj.dueDate)
-      ..writeByte(3)
-      ..write(obj.priority)
       ..writeByte(4)
+      ..writeByte(0)
+      ..write(obj.title)
+      ..writeByte(1)
+      ..write(obj.dueDate)
+      ..writeByte(2)
+      ..write(obj.priority)
+      ..writeByte(3)
       ..write(obj.completed);
   }
 
