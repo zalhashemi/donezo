@@ -6,6 +6,7 @@ class CustomColors {
   static const Color ourGrey = Color.fromRGBO(217, 217, 217, 1);
   static const Color ourWhite = Color.fromRGBO(255, 255, 255, 1);
   static const Color lilac = Color.fromRGBO(186, 131, 222, 1);
+  static const Color lighterGrey = Color.fromRGBO(237, 237, 237, 1);
 }
 
 ThemeData appTheme = ThemeData(
@@ -49,4 +50,5 @@ extension CustomTheme on ThemeData {
   Color get ourWhite => CustomColors.ourWhite;
   Color get lightPurple => CustomColors.lightPurple;
   Color get lilac => CustomColors.lilac;
+  Color get lighterGrey => CustomColors.lighterGrey;
 }

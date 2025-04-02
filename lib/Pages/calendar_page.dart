@@ -12,7 +12,7 @@ import 'package:table_calendar/table_calendar.dart';
 class CalendarPage extends StatefulWidget {
   final List<Task> tasks;
   final Function(Task) onTaskDeleted;
-  final Function(Task, bool?) onTaskChecked;
+  final Function(Task) onTaskChecked;
   final String userName;
   final String userEmail;
 
@@ -310,12 +310,12 @@ class _CalendarPageState extends State<CalendarPage> {
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 5),
                                         child: TaskTile(
-                                          key:ValueKey(task.key),
+                                          key: ValueKey(task.key),
                                           task: task,
                                           onDelete: () =>
                                               widget.onTaskDeleted(task),
-                                          onCheck: (value) =>
-                                              widget.onTaskChecked(task, value),
+                                          onCheck: (task) =>
+                                              widget.onTaskChecked(task),
                                         ),
                                       ))
                                   .toList(),

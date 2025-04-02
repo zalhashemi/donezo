@@ -1,5 +1,6 @@
 import 'package:donezo/Components/main_button.dart';
 import 'package:donezo/Components/progress_tile.dart';
+import 'package:donezo/Components/team_task_tile.dart';
 import 'package:donezo/Data/database.dart';
 import 'package:flutter/material.dart';
 import 'package:donezo/Components/task_tile.dart';
@@ -7,14 +8,14 @@ import 'package:donezo/Models/task.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:donezo/Pages/login_page.dart'; // Ensure this import exists
 
-class HomePage extends StatefulWidget {
+class OrgHomePage extends StatefulWidget {
   final List<Task> tasks;
   final Function(Task) onTaskDeleted;
   final Function(Task) onTaskChecked; // Updated
   final String userName;
   final String userEmail;
 
-  const HomePage({
+  const OrgHomePage({
     super.key,
     required this.tasks,
     required this.onTaskDeleted,
@@ -24,10 +25,10 @@ class HomePage extends StatefulWidget {
   });
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<OrgHomePage> createState() => _OrgHomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _OrgHomePageState extends State<OrgHomePage> {
   final DonezoDB _db = DonezoDB();
 
   @override
@@ -152,17 +153,35 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const SizedBox(height: 8),
                     Center(child: ProgressTile(tasks: widget.tasks)),
-                    const SizedBox(height: 35),
-                    _buildTaskSection(
-                      title: "Pending Tasks",
-                      tasks: pendingTasks,
-                      isEmptyMessage: "You have no pending tasks!",
-                    ),
-                    _buildTaskSection(
-                      title: "Completed Tasks",
-                      tasks: completedTasks,
-                      isEmptyMessage: "No completed tasks yet!",
-                    ),
+                    const SizedBox(height: 25),
+
+                    TeamTaskTile(
+                        teamName: 'Design',
+                        taskName: 'The Logo Process',
+                        priorityColor: Colors.red,
+                        taskStartDate: '14 Feb 2025',
+                        taskEndDate: '25 Apr 2025',
+                        taskPriority: 'High'),
+                    SizedBox(height: 20),
+                    TeamTaskTile(
+                        teamName: 'Marketing',
+                        taskName: 'Formulating the Strategy',
+                        priorityColor: Colors.purple,
+                        taskStartDate: '1 Mar 2025',
+                        taskEndDate: '10 Apr 2025',
+                        taskPriority: 'Low'),
+                    // Center(child: ProgressTile(tasks: widget.tasks)),
+                    // const SizedBox(height: 35),
+                    // _buildTaskSection(
+                    //   title: "Pending Tasks",
+                    //   tasks: pendingTasks,
+                    //   isEmptyMessage: "You have no pending tasks!",
+                    // ),
+                    // _buildTaskSection(
+                    //   title: "Completed Tasks",
+                    //   tasks: completedTasks,
+                    //   isEmptyMessage: "No completed tasks yet!",
+                    // ),
                   ],
                 ),
               ),

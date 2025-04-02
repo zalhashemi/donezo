@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:donezo/Components/main_button.dart';
 import 'package:donezo/Pages/home_page.dart';
 import 'package:donezo/Pages/calendar_page.dart';
+import 'package:donezo/Pages/org_home_page.dart'; // Import OrgHomePage
 import 'package:donezo/theme.dart';
 import 'package:donezo/Models/task.dart';
 import 'package:hive/hive.dart';
@@ -75,29 +76,38 @@ class _NavigationPageState extends State<NavigationPage> {
     if (_isLoading || _taskBox == null) {
       return [const Center(child: CircularProgressIndicator())];
     }
+    final currentUser = _db.getCurrentUser();
     return [
-      HomePage(
-        tasks: _taskBox!.values.toList(),
-        onTaskDeleted: _handleTaskDeleted,
-        onTaskChecked: _handleTaskChecked,
-        userEmail: _db.getCurrentUser()?.email ?? 'user@email.com',
-        userName: _db.getCurrentUser()?.name ?? 'User',
-      ),
+      // Check user type and display appropriate home page.
+      currentUser != null && currentUser.userType == 'Organization'
+          ? OrgHomePage(
+              tasks: _taskBox!.values.toList(),
+              onTaskDeleted: _handleTaskDeleted,
+              onTaskChecked: _handleTaskChecked,
+              userEmail: currentUser.email,
+              userName: currentUser.name,
+            )
+          : HomePage(
+              tasks: _taskBox!.values.toList(),
+              onTaskDeleted: _handleTaskDeleted,
+              onTaskChecked: _handleTaskChecked,
+              userEmail: currentUser?.email ?? 'user@email.com',
+              userName: currentUser?.name ?? 'User',
+            ),
       CalendarPage(
         onTaskDeleted: _handleTaskDeleted,
         tasks: _taskBox!.values.toList(),
         onTaskChecked: _handleTaskChecked,
-        userEmail: _db.getCurrentUser()?.email ?? 'user@email.com',
-        userName: _db.getCurrentUser()?.name ?? 'User',
+        userEmail: currentUser?.email ?? 'user@email.com',
+        userName: currentUser?.name ?? 'User',
       ),
     ];
   }
 
   void _handleTaskDeleted(Task task) => _db.deleteTask(task);
-  void _handleTaskChecked(Task task, bool? completed) {
-    if (completed == null) return;
-    final updatedTask = task.copyWith(completed: completed);
-    _db.updateTask(updatedTask);
+
+  void _handleTaskChecked(Task task) {
+    _db.updateTask(task);
   }
 
   void addTask(Task newTask) => _db.addTask(newTask);
@@ -415,9 +425,7 @@ class _CreateTaskBottomSheetContentState
                         height: 60,
                         child: ElevatedButton(
                           onPressed: () async {
-                            // Make async
-                            if (_formKey.currentState?.saveAndValidate() ??
-                                false) {
+                            if (_formKey.currentState?.saveAndValidate() ?? false) {
                               final newTask = Task(
                                 title: taskTitle.text,
                                 dueDate: _formKey.currentState!.value['date'],

@@ -23,7 +23,6 @@ class Task extends HiveObject {
     this.completed = false,
   });
 
-  // Essential copyWith method
   Task copyWith({
     String? title,
     DateTime? dueDate,
@@ -35,6 +34,6 @@ class Task extends HiveObject {
       dueDate: dueDate ?? this.dueDate,
       priority: priority ?? this.priority,
       completed: completed ?? this.completed,
-    );
+    ); 
   }
 }

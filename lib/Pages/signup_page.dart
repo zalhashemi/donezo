@@ -1,4 +1,5 @@
 import 'package:donezo/Data/database.dart';
+import 'package:donezo/Pages/org_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:donezo/Components/main_button.dart';
 import 'package:donezo/theme.dart';
@@ -88,10 +89,19 @@ class _SignupPageState extends State<SignupPage> {
 
     await _db.createUser(newUser);
     _db.setCurrentUser(newUser);
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const NavigationPage()),
-    );
+
+    // Navigate to OrgHomePage for organizations, otherwise to NavigationPage.
+    if (newUser.userType == 'Organization') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const NavigationPage()),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const NavigationPage()),
+      );
+    }
   }
 
   void _showErrorDialog(String message) {
@@ -123,7 +133,7 @@ class _SignupPageState extends State<SignupPage> {
             style: TextStyle(color: Theme.of(context).colorScheme.primary),
           )),
           content: SizedBox(
-            height: 50,
+            height: 100,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -146,21 +156,23 @@ class _SignupPageState extends State<SignupPage> {
             TextButton(
               child: const Text('Submit'),
               onPressed: () {
-                if (codeController.text.isNotEmpty) {
+                if (codeController.text == 'SWEN360') {
                   setState(() {
                     _organizationCode = codeController.text;
                     _selectedUserType = 'Organization';
                   });
                   Navigator.of(context).pop();
+                } else {
+                  _showErrorDialog('Please enter a valid organization code');
                 }
               },
             ),
           ],
-          insetPadding: const EdgeInsets.all(20), // Control dialog positioning
+          insetPadding: const EdgeInsets.all(20),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 24,
             vertical: 20,
-          ), // Inner padding
+          ),
         );
       },
     );

@@ -18,16 +18,18 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final DonezoDB _db = DonezoDB();
-
+  bool _obscurePassword = true;
   Future<void> _handleLogin() async {
     await _db.init();
     final users = _db.getUsers();
     final user = users.firstWhere(
-      (u) => u.email == _emailController.text && u.password == _passwordController.text,
-      orElse: () => User(id: '', name: '', email: '', password: '', userType: ''),
-      
+      (u) =>
+          u.email == _emailController.text &&
+          u.password == _passwordController.text,
+      orElse: () =>
+          User(id: '', name: '', email: '', password: '', userType: ''),
     );
-    _db.setCurrentUser(user); 
+    _db.setCurrentUser(user);
 
     if (user.id.isNotEmpty) {
       _db.setCurrentUser(user);
@@ -148,8 +150,21 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   TextBox(
                     labelText: 'Password',
-                    //TODO: add password handler
                     controller: _passwordController,
+                    obscureText: _obscurePassword,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.grey[600],
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    ),
                     height: 90,
                     borderColor: Colors.transparent,
                     labelColor: Colors.grey[600],

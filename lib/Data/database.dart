@@ -17,9 +17,7 @@ class DonezoDB {
   }
 
   Future<Box<Task>> getTaskBox() async {
-    if (_currentUser == null) {
-      throw Exception("No logged in user"); // Keep this as safety
-    }
+    if (_currentUser == null) throw Exception("No logged in user");
     final boxName = '$_taskBoxPrefix${_currentUser!.id}';
     return await Hive.openBox<Task>(boxName);
   }
@@ -45,7 +43,7 @@ class DonezoDB {
 
   Future<List<Task>> getCurrentUserTasks() async {
     final box = await getTaskBox();
-    return box.values.toList();
+    return box.values.cast<Task>().toList();
   }
 
   Future<void> addTask(Task task) async {
@@ -55,13 +53,7 @@ class DonezoDB {
 
   Future<void> updateTask(Task task) async {
     final box = await getTaskBox();
-
-    // Ensure the task has a valid integer key
-    if (task.key is int) {
-      await box.put(task.key, task);
-    } else {
-      throw Exception("Task has invalid key for update: ${task.key}");
-    }
+    await task.save(); // Use Hive's save method
   }
 
   Future<void> deleteTask(Task task) async {
