@@ -16,7 +16,7 @@ class TextBox extends StatelessWidget {
   final Color? fillColor;
   final Color? labelColor;
   final Color? borderColor;
-  final Widget? suffixIcon; // Added suffixIcon support
+  final Widget? suffixIcon; 
 
   const TextBox({
     super.key,
@@ -34,7 +34,7 @@ class TextBox extends StatelessWidget {
     this.fillColor,
     this.labelColor,
     this.borderColor,
-    this.suffixIcon, // Added to constructor
+    this.suffixIcon, 
   });
 
   @override
@@ -95,7 +95,7 @@ class TextBox extends StatelessWidget {
             floatingLabelBehavior: FloatingLabelBehavior.never,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-            suffixIcon: suffixIcon, // Added suffix icon support
+            suffixIcon: suffixIcon, 
           ),
         ),
       ),

@@ -26,7 +26,7 @@ class MainButton extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
         height: height ?? 35,
-        width: width ?? 100, // Default width
+        width: width ?? 100, 
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(30),

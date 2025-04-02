@@ -36,7 +36,7 @@ class _TaskTileState extends State<TaskTile> {
   void _handleCheckboxChange(bool? value) {
     if (value == null) return;
     setState(() => widget.task.completed = value);
-    widget.task.save(); // Save the task immediately
+    widget.task.save(); 
     widget.onCheck(widget.task);
   }
 

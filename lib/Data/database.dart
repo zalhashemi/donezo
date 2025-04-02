@@ -53,7 +53,7 @@ class DonezoDB {
 
   Future<void> updateTask(Task task) async {
     final box = await getTaskBox();
-    await task.save(); // Use Hive's save method
+    await task.save(); 
   }
 
   Future<void> deleteTask(Task task) async {

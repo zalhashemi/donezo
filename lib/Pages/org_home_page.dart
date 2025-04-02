@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:donezo/Components/task_tile.dart';
 import 'package:donezo/Models/task.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:donezo/Pages/login_page.dart'; // Ensure this import exists
+import 'package:donezo/Pages/login_page.dart'; 
 
 class OrgHomePage extends StatefulWidget {
   final List<Task> tasks;
   final Function(Task) onTaskDeleted;
-  final Function(Task) onTaskChecked; // Updated
+  final Function(Task) onTaskChecked; 
   final String userName;
   final String userEmail;
 
@@ -19,7 +19,7 @@ class OrgHomePage extends StatefulWidget {
     super.key,
     required this.tasks,
     required this.onTaskDeleted,
-    required this.onTaskChecked, // Updated
+    required this.onTaskChecked, 
     required this.userName,
     required this.userEmail,
   });
@@ -52,7 +52,6 @@ class _OrgHomePageState extends State<OrgHomePage> {
               ),
             ),
           ),
-          // Profile Dropdown Button
           Positioned(
             top: 50,
             left: 20,
@@ -76,7 +75,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
                 ),
                 const PopupMenuDivider(),
                 PopupMenuItem(
-                  onTap: () {}, // Switch to Organization Mode (empty for now)
+                  onTap: () {}, 
                   child: const ListTile(
                     leading: Icon(Icons.group_outlined),
                     title: Text('Switch to Organization Mode'),
@@ -254,7 +253,7 @@ class _OrgHomePageState extends State<OrgHomePage> {
                         task: task,
                         onDelete: () => widget.onTaskDeleted(task),
                         onCheck: (task) =>
-                            widget.onTaskChecked(task), // Updated
+                            widget.onTaskChecked(task), 
                       ),
                     );
                   },

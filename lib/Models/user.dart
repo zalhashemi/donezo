@@ -1,9 +1,8 @@
-// user.dart
 import 'package:hive/hive.dart';
 
-part 'user.g.dart'; // Generated file
+part 'user.g.dart'; 
 
-@HiveType(typeId: 1) // Unique typeId (0 is used for Task)
+@HiveType(typeId: 1)
 class User {
   @HiveField(0)
   final String id;

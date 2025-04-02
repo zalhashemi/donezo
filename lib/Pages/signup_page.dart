@@ -30,7 +30,6 @@ class _SignupPageState extends State<SignupPage> {
   bool _obscureConfirmPassword = true;
 
   Future<void> _handleSignup() async {
-    // Field empty validation
     if (_nameController.text.isEmpty ||
         _emailController.text.isEmpty ||
         _passwordController.text.isEmpty ||
@@ -39,7 +38,6 @@ class _SignupPageState extends State<SignupPage> {
       return;
     }
 
-    // Name validation (letters only)
     if (!RegExp(r'^[a-zA-Z ]+$').hasMatch(_nameController.text)) {
       _showErrorDialog('Name can only contain letters');
       return;
@@ -49,13 +47,11 @@ class _SignupPageState extends State<SignupPage> {
       return;
     }
 
-    // Email validation
     if (!_emailController.text.contains('@')) {
       _showErrorDialog('Invalid email format');
       return;
     }
 
-    // Password validation
     if (_passwordController.text.length < 8) {
       _showErrorDialog('Password must be at least 8 characters');
       return;
@@ -90,7 +86,6 @@ class _SignupPageState extends State<SignupPage> {
     await _db.createUser(newUser);
     _db.setCurrentUser(newUser);
 
-    // Navigate to OrgHomePage for organizations, otherwise to NavigationPage.
     if (newUser.userType == 'Organization') {
       Navigator.pushReplacement(
         context,

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:donezo/Components/main_button.dart';
 import 'package:donezo/Pages/home_page.dart';
 import 'package:donezo/Pages/calendar_page.dart';
-import 'package:donezo/Pages/org_home_page.dart'; // Import OrgHomePage
+import 'package:donezo/Pages/org_home_page.dart'; 
 import 'package:donezo/theme.dart';
 import 'package:donezo/Models/task.dart';
 import 'package:hive/hive.dart';
@@ -37,7 +37,7 @@ class _NavigationPageState extends State<NavigationPage> {
       final user = _db.getCurrentUser();
 
       if (user == null) {
-        // Navigate to starter page if no user
+        
         if (mounted) {
           Navigator.pushReplacement(
             context,
@@ -50,7 +50,7 @@ class _NavigationPageState extends State<NavigationPage> {
       _taskBox = await _db.getTaskBox();
       _taskBox?.watch().listen((_) => setState(() {}));
     } catch (e) {
-      // Handle any errors
+      
       if (mounted) {
         Navigator.pushReplacement(
           context,
@@ -78,7 +78,6 @@ class _NavigationPageState extends State<NavigationPage> {
     }
     final currentUser = _db.getCurrentUser();
     return [
-      // Check user type and display appropriate home page.
       currentUser != null && currentUser.userType == 'Organization'
           ? OrgHomePage(
               tasks: _taskBox!.values.toList(),
@@ -159,9 +158,6 @@ class _NavigationPageState extends State<NavigationPage> {
     );
   }
 }
-
-// Keep the CreateTaskBottomSheet and _CreateTaskBottomSheetContent classes
-// exactly as you have them in your original code
 
 class CreateTaskBottomSheet {
   static void show(BuildContext context, Function(Task) addTask) {

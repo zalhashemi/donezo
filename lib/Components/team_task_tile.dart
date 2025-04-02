@@ -39,7 +39,7 @@ class _TeamTaskTileState extends State<TeamTaskTile> {
             top: 13,
             left: 20,
             child: Text(
-              widget.teamName, // Fixed: Added widget prefix
+              widget.teamName, 
               style: TextStyle(
                 fontSize: 18,
                 color: Theme.of(context).colorScheme.primary,
@@ -53,7 +53,7 @@ class _TeamTaskTileState extends State<TeamTaskTile> {
             child: Row(
               children: [
                 Text(
-                  widget.taskName, // Fixed: Added widget prefix
+                  widget.taskName, 
                   style: TextStyle(
                     fontSize: 18,
                     color: Theme.of(context).colorScheme.tertiary,
@@ -99,7 +99,7 @@ class _TeamTaskTileState extends State<TeamTaskTile> {
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
-                      width: 175 * 0.3, // Fixed: Correct width calculation (30% of 175)
+                      width: 175 * 0.3, 
                       height: 10,
                       decoration: BoxDecoration(
                         color: const Color(0xFF66417D),
@@ -133,7 +133,7 @@ class _TeamTaskTileState extends State<TeamTaskTile> {
                 ),
                 const SizedBox(width: 2),
                 Text(
-                  widget.taskStartDate, // Fixed: Use actual start date
+                  widget.taskStartDate, 
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 14,
@@ -149,7 +149,7 @@ class _TeamTaskTileState extends State<TeamTaskTile> {
                 ),
                 const SizedBox(width: 2),
                 Text(
-                  widget.taskEndDate, // Fixed: Use actual end date
+                  widget.taskEndDate, 
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 14,
@@ -175,12 +175,12 @@ class _TeamTaskTileState extends State<TeamTaskTile> {
                   height: 30,
                   width: 70,
                   decoration: BoxDecoration(
-                    color: widget.priorityColor, // Use provided priority color
+                    color: widget.priorityColor, 
                     borderRadius: BorderRadius.circular(40),
                   ),
                   child: Center(
                     child: Text(
-                      widget.taskPriority, // Fixed: Use actual priority text
+                      widget.taskPriority, 
                       style: const TextStyle(
                         color: Colors.white,
                         fontFamily: 'Baloo 2',
