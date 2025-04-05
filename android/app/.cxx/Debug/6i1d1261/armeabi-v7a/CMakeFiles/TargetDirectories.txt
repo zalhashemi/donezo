@@ -1,0 +1,2 @@
+D:/donezo/android/app/.cxx/Debug/6i1d1261/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/donezo/android/app/.cxx/Debug/6i1d1261/armeabi-v7a/CMakeFiles/rebuild_cache.dir

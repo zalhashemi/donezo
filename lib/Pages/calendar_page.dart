@@ -1,12 +1,9 @@
-import 'package:donezo/Components/main_button.dart';
-import 'package:donezo/Components/progress_tile.dart';
+import 'package:donezo/Components/task_tile.dart';
 import 'package:donezo/Data/database.dart';
+import 'package:donezo/Models/task.dart';
+import 'package:donezo/Pages/login_page.dart';
 import 'package:donezo/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:donezo/Components/task_tile.dart';
-import 'package:donezo/Models/task.dart';
-import 'package:hive_flutter/adapters.dart';
-import 'package:donezo/Pages/login_page.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarPage extends StatefulWidget {
@@ -126,6 +123,7 @@ class _CalendarPageState extends State<CalendarPage> {
             bottom: 0,
             left: 0,
             right: 0,
+            top: 100,
             child: Container(
               height: 700,
               decoration: const BoxDecoration(
@@ -244,42 +242,52 @@ class _CalendarPageState extends State<CalendarPage> {
                         dowTextFormatter: null,
                       ),
                     ),
+                    const Divider(
+                      color: Colors.grey,
+                      thickness: .1,
+                    ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 40, vertical: 20),
+                          horizontal: 20, vertical: 20),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: ['All Tasks', 'Pending', 'Done']
-                            .map((filter) => GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedFilter = filter;
-                                    });
-                                  },
-                                  child: SizedBox(
-                                    width: 105,
-                                    height: 30,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: _selectedFilter == filter
-                                            ? _selectedColor
-                                            : Theme.of(context).ourGrey,
-                                        borderRadius: BorderRadius.circular(20),
-                                        border: Border.all(
-                                          color: _selectedFilter == filter
-                                              ? _selectedColor
-                                              : Colors.transparent,
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          filter,
-                                          style: TextStyle(
+                            .map((filter) => Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _selectedFilter = filter;
+                                        });
+                                      },
+                                      child: SizedBox(
+                                        width: 105,
+                                        height: 30,
+                                        child: Container(
+                                          decoration: BoxDecoration(
                                             color: _selectedFilter == filter
-                                                ? Colors.white
-                                                : _selectedColor,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold,
+                                                ? _selectedColor
+                                                : Theme.of(context).ourGrey,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            border: Border.all(
+                                              color: _selectedFilter == filter
+                                                  ? _selectedColor
+                                                  : Colors.transparent,
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              filter,
+                                              style: TextStyle(
+                                                color: _selectedFilter == filter
+                                                    ? Colors.white
+                                                    : _selectedColor,
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),

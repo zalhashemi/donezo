@@ -1,14 +1,14 @@
-import 'package:donezo/Data/database.dart';
-import 'package:donezo/Pages/starter_page.dart';
-import 'package:flutter/material.dart';
 import 'package:donezo/Components/main_button.dart';
-import 'package:donezo/Pages/home_page.dart';
-import 'package:donezo/Pages/calendar_page.dart';
-import 'package:donezo/Pages/org_home_page.dart'; 
-import 'package:donezo/theme.dart';
+import 'package:donezo/Data/database.dart';
 import 'package:donezo/Models/task.dart';
-import 'package:hive/hive.dart';
+import 'package:donezo/Pages/calendar_page.dart';
+import 'package:donezo/Pages/home_page.dart';
+import 'package:donezo/Pages/org_home_page.dart';
+import 'package:donezo/Pages/starter_page.dart';
+import 'package:donezo/theme.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
 class NavigationPage extends StatefulWidget {
@@ -37,7 +37,6 @@ class _NavigationPageState extends State<NavigationPage> {
       final user = _db.getCurrentUser();
 
       if (user == null) {
-        
         if (mounted) {
           Navigator.pushReplacement(
             context,
@@ -50,7 +49,6 @@ class _NavigationPageState extends State<NavigationPage> {
       _taskBox = await _db.getTaskBox();
       _taskBox?.watch().listen((_) => setState(() {}));
     } catch (e) {
-      
       if (mounted) {
         Navigator.pushReplacement(
           context,
@@ -289,7 +287,19 @@ class _CreateTaskBottomSheetContentState
                           return null;
                         },
                         decoration: InputDecoration(
-                          labelText: 'Task Title',
+                          hintStyle: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Baloo2',
+                            color: Colors.grey,
+                          ),
+                          hintText: 'Task Title',
+                          errorStyle: TextStyle(
+                            color: Colors.redAccent, // لون نص الخطأ
+                            fontSize: 13, // حجم النص
+                            fontWeight: FontWeight.w500, // الوزن
+                            fontFamily: 'Baloo2', // خط مخصص (اختياري)
+                          ),
                           labelStyle: TextStyle(
                             fontSize: 16,
                             fontFamily: 'Baloo 2',
@@ -314,36 +324,32 @@ class _CreateTaskBottomSheetContentState
                     alignment: Alignment.centerLeft,
                     child: Padding(
                       padding: EdgeInsets.only(left: 50.0, top: 10, bottom: 2),
-                      child: Text(
-                        "Due Date",
-                        style: TextStyle(fontSize: 20, color: Colors.white),
-                      ),
                     ),
                   ),
                   Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding:
-                          const EdgeInsets.only(left: 50.0, top: 0, bottom: 3),
-                      child: Container(
-                        height: 45,
-                        width: 320,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          color: Colors.white,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 15.0),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.calendar_today_outlined,
-                                color: Theme.of(context).colorScheme.primary,
-                                size: 25,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
+                    alignment: Alignment.center,
+                    child: Container(
+                      height: 45,
+                      width: 320,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                        color: Colors.white,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 15.0),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.calendar_today_outlined,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: 25,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: SizedBox(
+                                width: 330,
                                 child: FormBuilderDateTimePicker(
+                                  firstDate: DateTime.now(),
                                   name: 'date',
                                   inputType: InputType.date,
                                   format: DateFormat("MMMMEEEEd"),
@@ -353,7 +359,19 @@ class _CreateTaskBottomSheetContentState
                                     return null;
                                   },
                                   decoration: InputDecoration(
-                                    labelText: 'Day, Month Date',
+                                    hintText: "Select Due Date",
+                                    hintStyle: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      fontFamily: 'Baloo2',
+                                      color: Colors.grey,
+                                    ),
+                                    errorStyle: TextStyle(
+                                      color: Colors.redAccent, // لون نص الخطأ
+                                      fontSize: 13, // حجم النص
+                                      fontWeight: FontWeight.w500, // الوزن
+                                      fontFamily: 'Baloo2', // خط مخصص (اختياري)
+                                    ),
                                     labelStyle: TextStyle(
                                       fontSize: 16,
                                       fontFamily: 'Baloo 2',
@@ -365,16 +383,19 @@ class _CreateTaskBottomSheetContentState
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(
-                      padding: EdgeInsets.only(left: 50.0, top: 10, bottom: 3),
+                      padding: EdgeInsets.only(left: 20.0, top: 10, bottom: 3),
                       child: Text(
                         "Priority",
                         style: TextStyle(fontSize: 20, color: Colors.white),
@@ -382,11 +403,12 @@ class _CreateTaskBottomSheetContentState
                     ),
                   ),
                   Align(
-                    alignment: Alignment.centerLeft,
+                    alignment: Alignment.center,
                     child: Padding(
-                      padding:
-                          const EdgeInsets.only(left: 50.0, top: 1, bottom: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 5),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           MainButton(
                             text: 'High',
@@ -412,6 +434,9 @@ class _CreateTaskBottomSheetContentState
                       ),
                     ),
                   ),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   Align(
                     alignment: Alignment.center,
                     child: Padding(
@@ -421,7 +446,8 @@ class _CreateTaskBottomSheetContentState
                         height: 60,
                         child: ElevatedButton(
                           onPressed: () async {
-                            if (_formKey.currentState?.saveAndValidate() ?? false) {
+                            if (_formKey.currentState?.saveAndValidate() ??
+                                false) {
                               final newTask = Task(
                                 title: taskTitle.text,
                                 dueDate: _formKey.currentState!.value['date'],
