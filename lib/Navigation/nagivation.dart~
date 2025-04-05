@@ -196,6 +196,8 @@ class _CreateTaskBottomSheetContentState
   String selectedPriority = 'medium';
   final TextEditingController taskTitle = TextEditingController();
 
+
+
   void selectPriority(String priority) {
     setState(() => selectedPriority = priority);
   }
@@ -478,7 +480,9 @@ class _CreateTaskBottomSheetContentState
                                 if (errors?['title'] != null) errors!['title']!,
                                 if (errors?['date'] != null) errors!['date']!,
                               ];
-                              if (errorMessages.isNotEmpty) {}
+                              if (errorMessages.isNotEmpty) {
+                                
+                              }
                             }
                           },
                           style: ElevatedButton.styleFrom(
